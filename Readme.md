@@ -11,7 +11,7 @@ Nexus is a small, zero-dependency library for dispatching **actions**, data
 describing what should happen, with mostly pure functions.
 
 ```clj
-no.cjohansen/nexus {:mvn/version "2026.07.1"}
+no.cjohansen/nexus {:mvn/version "2026.08.1"}
 ```
 
 [Replicant](https://replicant.fun) provides a data-driven and functional
@@ -1090,6 +1090,22 @@ and [Teodor Heggelund](https://play.teod.eu/)
 ([@teodorlu](https://github.com/teodorlu)).
 
 ## Changelog
+
+### 2026.08.1
+
+Add `:nexus/expansions` as the preferred alternative to `:nexus/actions`. This
+avoids overloading the term "action", which now explicitly refers only to the
+data structure, while "expansion handler" refers to the pure function that can
+turn one action into a new sequence of actions.
+
+Fix outstanding issues in the interceptor model after the change in 2026.06.2.
+Action interceptors now wrap the entire action dispatch life-cycle for _any_
+action, regardless of whether it is handled by an expansion handler or an effect
+handler. This is a breaking change, but only if you have custom interceptors.
+
+Fix buggy behavior in the action log when directly dispatching effects, and for
+nested dispatches. These fixes were enabled by the changes to the interceptor
+model.
 
 ### 2026.07.1
 
