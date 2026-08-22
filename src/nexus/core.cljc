@@ -13,21 +13,38 @@
   (when-let [on-error (:nexus/on-error nexus)]
     (try
       (on-error (dissoc ctx :stack :queue) error)
-      (catch #?(:clj Exception :cljs :default) _
-        ;; Well, you had your chance!
-        )))
+      ;; Well, you had your chance!
+      #?@(:clj
+          [(catch Exception _)]
+          :cljs
+          [(catch :default _)]
+          :cljd
+          [(catch Exception _)
+           (catch cljd.core/ExceptionInfo _)])))
   error)
+
+(defn- add-then-log-error [ctx data e]
+  (update ctx :errors conjv
+          (->> (assoc data
+                      :err e
+                      :trace (:trace ctx))
+               (log-error (:nexus ctx) ctx))))
 
 (defn ^{:no-doc true :indent 1} try-f [ctx f & [data]]
   (try
     (cond-> ctx
       (ifn? f) f)
-    (catch #?(:clj Exception :cljs :default) e
-      (update ctx :errors conjv
-              (->> (assoc data
-                          :err e
-                          :trace (:trace ctx))
-                   (log-error (:nexus ctx) ctx))))))
+    #?@(:clj
+        [(catch Exception e
+           (add-then-log-error ctx data e))]
+        :cljs
+        [(catch :default e
+           (add-then-log-error ctx data e))]
+        :cljd
+        [(catch Exception e
+           (add-then-log-error ctx data e))
+         (catch cljd.core/ExceptionInfo e
+           (add-then-log-error ctx data e))])))
 
 (defn ^{:indent 1 :no-doc true} run-interceptors [ctx interceptors [before after k]]
   (letfn [(invoke [f state phase interceptor]
@@ -96,8 +113,17 @@
                        (get-in nexus [:nexus/actions kind]))]
           (let [[actions err] (try
                                 [(apply f state (next action))]
-                                (catch #?(:clj Exception :cljs :default) e
-                                  [nil e]))]
+                                #?@(:clj
+                                    [(catch Exception e
+                                       [nil e])]
+                                    :cljs
+                                    [(catch :default e
+                                       [nil e])]
+                                    :cljd
+                                    [(catch Exception e
+                                       [nil e])
+                                     (catch cljd.core/ExceptionInfo e
+                                       [nil e])]))]
             (cond
               err
               (recur (->> {:action action

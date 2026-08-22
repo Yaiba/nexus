@@ -15,4 +15,9 @@
   test:squint
   {:doc "Run tests under squint"
    :task (do (shell "npm install")
-             (shell "npm test"))}}}
+             (shell "npm test"))}
+  
+  test:cljd
+  {:doc "Run tests under ClojureDart"
+   :task (do (shell "clojure -M:test-cljd clean")
+             (shell "clojure -M:test-cljd test nexus.run-tests"))}}}

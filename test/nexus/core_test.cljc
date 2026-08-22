@@ -952,3 +952,60 @@
                       :trace [[:actions/inc 2]]
                       :err {:message "Boom!"
                             :data {}}}]}))))
+
+#?(:cljd
+   (deftest cljd-rethrows-arbitrary-object-test
+     (testing "Does not catch an arbitrary non-null Dart Object"
+       (is (= "Boom!"
+              (try
+                (nexus/expand-actions
+                 {:nexus/expansions
+                  {:actions/inc
+                   (fn [_ _]
+                     (throw "Boom!"))}}
+                 {}
+                 [[:actions/inc 2]])
+                nil
+                (catch dynamic e
+                  e)))))))
+
+#?(:cljd
+   (deftest cljd-rethrows-dart-error-test
+     (testing "Does not catch a dart:core Error"
+       (is (thrown? AssertionError
+                    (nexus/expand-actions
+                     {:nexus/expansions
+                      {:actions/inc
+                       (fn [_ _]
+                         (throw (AssertionError. "Boom!")))}}
+                     {}
+                     [[:actions/inc 2]]))))))
+
+#?(:cljd
+   (deftest cljd-throw-dart-exception-test
+     (testing "Returns errors from action handler throwing a dart:core Exception"
+       (is (= (-> {:nexus/expansions
+                   {:actions/inc
+                    (fn [_ _]
+                      (throw (Exception. "Boom!")))}}
+                  (nexus/expand-actions {} [[:actions/inc 2]])
+                  h/datafy-errors)
+              {:errors [{:phase :expand-action
+                         :action [:actions/inc 2]
+                         :trace [[:actions/inc 2]]
+                         :err {:message "Exception: Boom!"
+                               :data nil}}]})))
+
+     (testing "Returns errors from effect handler throwing a dart:core Exception"
+       (is (= (-> {:nexus/system->state deref
+                   :nexus/effects
+                   {:effects/fail
+                    (fn [_ _]
+                      (throw (Exception. "Boom!")))}}
+                  (nexus/dispatch (atom nil) {} [[:effects/fail]])
+                  h/datafy-errors)
+              {:errors [{:phase :execute-effect
+                         :effect [:effects/fail]
+                         :trace [[:effects/fail]]
+                         :err {:message "Exception: Boom!"
+                               :data nil}}]})))))

@@ -21,6 +21,14 @@
    :main-opts ["-m" "cljs-test-runner.main"
                "-c" "{:optimizations :advanced}"
                "-x" "node"]}
+
+  :test-cljd
+  {:extra-paths ["test"]
+   :extra-deps {tensegritics/clojuredart
+                {:git/url "https://github.com/tensegritics/ClojureDart.git"
+                 :sha "721e927ac7d3417b36e0187ccaff17b455e50897"}}
+   :main-opts ["-m" "cljd.build"]}
+
   :jar
   {:extra-deps {pack/pack.alpha {:git/url "https://github.com/juxt/pack.alpha.git"
                                  :sha "e518d9b2b70f4292c9988d2792b8667d88a6f4df"}}
@@ -31,4 +39,6 @@
    :exec-fn deps-deploy.deps-deploy/deploy
    :exec-args {:installer :remote
                :sign-releases? false
-               :artifact "nexus.jar"}}}}
+               :artifact "nexus.jar"}}}
+
+ :cljd/opts {:kind :dart}}
