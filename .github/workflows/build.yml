@@ -44,6 +44,11 @@ jobs:
         with:
           node-version: 24
 
+      - name: Setup Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: 3.13
+
       - name: Install clojure tools
         uses: DeLaGuardo/setup-clojure@13.6.1
         with:
@@ -62,3 +67,6 @@ jobs:
 
       - name: Run squint tests
         run: bb test:squint
+
+      - name: Run ClojureDart tests
+        run: bb test:cljd
