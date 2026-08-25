@@ -1,0 +1,4 @@
+{:hooks {:analyze-call {nexus.registry/register-action! nexus.defregistry/register-action!
+                        nexus.registry/register-expansion! nexus.defregistry/register-expansion!
+                        nexus.registry/register-effect! nexus.defregistry/register-effect!
+                        nexus.registry/register-placeholder! nexus.defregistry/register-placeholder!}}}
