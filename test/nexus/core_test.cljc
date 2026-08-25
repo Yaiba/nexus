@@ -691,7 +691,7 @@
                   :nexus/effects
                   {:effects/save
                    (fn [_ system k v]
-                     (swap! system assoc-in k v))}}
+                     (swap! system assoc-in [k] v))}}
                  (h/with-interceptor :before-effect
                      (fn [ctx]
                        (swap! log conj (second (:effect ctx)))
