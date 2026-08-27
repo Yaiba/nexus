@@ -10,7 +10,9 @@
   (swap! !registry assoc :nexus/system+dispatch-data->state f))
 
 (defn ^{:indent 1} register-action! [action-k f]
-  (swap! !registry assoc-in [:nexus/expansions action-k] f))
+  (swap! !registry assoc-in [:nexus/expansions action-k] f)
+  ;; For backwards compatibility
+  (swap! !registry assoc-in [:nexus/actions action-k] f))
 
 (defn ^{:indent 1} register-expansion! [action-k f]
   (swap! !registry assoc-in [:nexus/expansions action-k] f))
