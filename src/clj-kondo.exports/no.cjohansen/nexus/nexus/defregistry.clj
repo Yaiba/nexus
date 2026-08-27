@@ -1,24 +1,24 @@
 (ns nexus.defregistry
   (:require [clj-kondo.hooks-api :as api]))
 
-(defn register-keyword [node reg-fn-symbol]
-  (let [[kw & args] (rest (:children node))]
-    {:node (api/list-node
-            (list* (api/reg-keyword! kw reg-fn-symbol)
-                   args))}))
+(defn register-keyword [m reg-fn-symbol]
+  (-> m
+      (update-in [:node :children] vec)
+      (update-in [:node :children 1]
+                 #(with-meta (api/reg-keyword! % reg-fn-symbol)
+                    (meta %)))))
 
-(defn register-action! [{:keys [node]}]
-  (register-keyword node 'nexus.registry/register-action!))
+(defn register-action! [m]
+  (register-keyword m 'nexus.registry/register-action!))
 
-(defn register-expansion! [{:keys [node]}]
-  (register-keyword node 'nexus.registry/register-expansion!))
+(defn register-expansion! [m]
+  (register-keyword m 'nexus.registry/register-expansion!))
 
-(defn register-effect! [{:keys [node]}]
-  (register-keyword node 'nexus.registry/register-effect!))
+(defn register-effect! [m]
+  (register-keyword m 'nexus.registry/register-effect!))
 
-(defn register-placeholder! [{:keys [node]}]
-  (register-keyword node 'nexus.registry/register-placeholder!))
-
+(defn register-placeholder! [m]
+  (register-keyword m 'nexus.registry/register-placeholder!))
 
 (comment
 
