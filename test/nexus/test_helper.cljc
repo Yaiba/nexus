@@ -1,20 +1,15 @@
 (ns nexus.test-helper
   (:require [clojure.walk :as walk]))
 
-(defn get-message [e]
-  #?(:clj (.getMessage e)
-     :cljs (.-message e)
-     :cljd (ex-message e)))
-
 (defn ex->data [e]
-  {:message (get-message e)
+  {:message (ex-message e)
    :data (walk/prewalk
           (fn [x]
             (cond
               (and (:err x) (not (map? (:err x))))
               (let [data (ex-data (:err x))]
                 (assoc x :err
-                       (cond-> {:message (get-message (:err x))}
+                       (cond-> {:message (ex-message (:err x))}
                          (not-empty data) (assoc :data data))))
 
               (fn? x)
