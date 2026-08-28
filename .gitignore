@@ -11,3 +11,9 @@
 /out/
 /cljs-test-runner-out/
 /nexus.jar
+/.clojuredart/
+/lib/cljd-out/
+/test/cljd-out/
+/.dart_tool/
+/pubspec.lock
+/analysis_options.yaml

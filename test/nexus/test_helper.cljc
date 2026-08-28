@@ -3,7 +3,8 @@
 
 (defn get-message [e]
   #?(:clj (.getMessage e)
-     :cljs (.-message e)))
+     :cljs (.-message e)
+     :cljd (ex-message e)))
 
 (defn ex->data [e]
   {:message (get-message e)
